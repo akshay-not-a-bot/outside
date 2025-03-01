@@ -63,18 +63,11 @@ def get_weather(cords):
         response = responses[0]
 
         # Current values. The order of variables needs to be the same as requested.
-        current = response.Current()
-        current_temperature_2m = current.Variables(0).Value()
-        current_is_day = current.Variables(1).Value()
-        current_precipitation = current.Variables(2).Value()
-        current_wind_speed_10m = current.Variables(3).Value()
-
-        # printing data:
-        print(f"Current time {current.Time()}")
-        print(f"Current temperature_2m {current_temperature_2m}")
-        print(f"Current is_day {current_is_day}")
-        print(f"Current precipitation {current_precipitation}")
-        print(f"Current wind_speed_10m {current_wind_speed_10m}")
+        return response.Current()
+        # current_temperature_2m = current.Variables(0).Value()
+        # current_is_day = current.Variables(1).Value()
+        # current_precipitation = current.Variables(2).Value()
+        # current_wind_speed_10m = current.Variables(3).Value()
 
     except Exception as E:
         print(f"Error while fetching weather data: {E}")
@@ -87,6 +80,7 @@ def main():
     cords = get_cordinates(city)
     print(cords)
     weather_data = get_weather(cords)
+    print(f"Temp: {weather_data.Variables(0).Value():2f}")
 
 
 if __name__ == "__main__":

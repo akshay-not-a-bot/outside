@@ -70,8 +70,15 @@ def get_weather(cords):
     params = {
         "latitude": cords[0],
         "longitude": cords[1],
-        "current": ["temperature_2m", "is_day", "precipitation", "wind_speed_10m"],
-        "hourly": ["temperature_2m", "precipitation", "wind_speed_10m", "is_day"],
+        "current": [
+            "temperature_2m",
+            "relative_humidity_2m",
+            "apparent_temperature",
+            "is_day",
+            "wind_speed_10m",
+        ],
+        "hourly": ["temperature_2m", "apparent_temperature", "wind_speed_10m"],
+        "forecast_hours": 6,
     }
 
     try:
@@ -79,7 +86,7 @@ def get_weather(cords):
         response = responses[0]
 
         # Current values. The order of variables needs to be the same as requested.
-        return response.Current()
+        return response
         # current_temperature_2m = current.Variables(0).Value()
         # current_is_day = current.Variables(1).Value()
         # current_precipitation = current.Variables(2).Value()

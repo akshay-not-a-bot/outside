@@ -186,15 +186,6 @@ class WeatherApp(ttk.Frame):
             command=lambda: (self.cities_popup(), self._get_input()),
         ).pack(side="right")
 
-        # storing weather data
-        # not working cause create_widget gets called first in __init__ before popup so self.weather doesn't exist at that time
-        # cause unless you search for city popup won't be called but this printing will still get executed.
-        # so I need to maybe call the popup window first at the time of app opening and halt the create_widgets with wait.window
-        # untill user selcets city.
-
-        # OR there is a welcome screen on greetings and will prompt to select the city first and maybe store that in a file and
-        # only open this welcome screen if the file is empty
-
         # self.cur_temp = self.weather_data.current.Variables(0).Value()
         # print(self.cur_temp)
 

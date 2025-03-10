@@ -47,12 +47,11 @@ def get_city(city: str):
 
 
 # this function gets cities list from get_city() and get's user picked index of the city from main
-def get_cordinates(cities, p):
-    pick = int(p)
+def get_cordinates(cities, pick):
     # $PRODUCTION$ printing list in terminal for testing purposes
-    # print("Index    Name    State   Country")
+    # print("Index    Name    State   Country   Lat     Long")
     # for city in cities:
-    #     print(f"{city[0]}.  {city[1]}    {city[2]}   {city[3]}")
+    #     print(f"{city[0]}.  {city[1]}    {city[2]}   {city[3]}    {city[4]}   {city[5]}")
     lat = cities[pick - 1][4]
     long = cities[pick - 1][5]
     return lat, long
@@ -85,17 +84,10 @@ def get_weather(cords):
         responses = openmeteo.weather_api(url, params=params)
         response = responses[0]
 
-        # Current values. The order of variables needs to be the same as requested.
         return response
-        # current_temperature_2m = current.Variables(0).Value()
-        # current_is_day = current.Variables(1).Value()
-        # current_precipitation = current.Variables(2).Value()
-        # current_wind_speed_10m = current.Variables(3).Value()
 
     except Exception as E:
         print(f"Error while fetching weather data: {E}")
-
-        # NOT HANDLING HOURLY DATA AND FORECAST YET
 
 
 def main():

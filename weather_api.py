@@ -78,6 +78,7 @@ def get_weather(cords):
         ],
         "hourly": ["temperature_2m", "apparent_temperature", "wind_speed_10m"],
         "forecast_hours": 6,
+        "daily": ["temperature_2m_max", "wind_speed_10m_max"],
     }
 
     try:

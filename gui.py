@@ -41,7 +41,12 @@ class WeatherApp(ttk.Frame):
 
     def _get_index(self, event=None):
         # storing user choice
-        self.index = int(self.index_entry.get()) - 1
+        selected = self.city_table.view.selection()
+        if selected:
+            # extracting values from first selected row
+            values = self.city_table.view.item(selected[0], "values")
+
+        self.index = int(values[0]) - 1
         self.popup.destroy()
 
     def _get_input(self, event=None):
@@ -107,31 +112,33 @@ class WeatherApp(ttk.Frame):
         self.cities = weather.get_city(self.user_input)
 
         # creating table for cities
-        header = ["Index", "City Name", "State", "Country"]
+        header = ["Index", "City Name", "State", "Country", "Latitude", "Longitude"]
         filtered_city_data = [
-            (city[0], city[1], city[2], city[3]) for city in self.cities
+            (city[0], city[1], city[2], city[3], city[4], city[5])
+            for city in self.cities
         ]
-        city_table = Tableview(
+        self.city_table = Tableview(
             self.popup,
             coldata=header,
             rowdata=filtered_city_data,
             bootstyle="success",
             autoalign=True,
         )
-        city_table.pack(padx=20, pady=20)
+        self.city_table.pack(padx=20, pady=20)
+        self.city_table.view.bind("<ButtonRelease-1>", self._get_index)
 
         # Enter widget to get the user choice index
-        index_frame = tb.Labelframe(
-            self.popup,
-            text="Enter the index of the city",
-            style="success",
-        )
-        index_frame.pack(padx=20, ipadx=20)
-        self.index_entry = ttk.Entry(
-            index_frame, justify="center", font=("Poppins", 16)
-        )
-        self.index_entry.pack()
-        self.index_entry.bind("<Return>", self._get_index)
+        # index_frame = tb.Labelframe(
+        #     self.popup,
+        #     text="Enter the index of the city",
+        #     style="success",
+        # )
+        # index_frame.pack(padx=20, ipadx=20)
+        # self.index_entry = ttk.Entry(
+        #     index_frame, justify="center", font=("Poppins", 16)
+        # )
+        # self.index_entry.pack()
+        # self.index_entry.bind("<Return>", self._get_index)
         self.wait_window(self.popup)
 
         # Storing values
@@ -172,7 +179,7 @@ class WeatherApp(ttk.Frame):
 
         self.master.wait_window(self.temp_frame)
 
-    def select_city(self, table):
+    def select_city(self, event=None):
         selected_city = self.saved_table.view.selection()
         if selected_city:
             # extracting values from first selected row
@@ -212,11 +219,7 @@ class WeatherApp(ttk.Frame):
     def default_op(self, cords):
         # setting current city as default if button checked
         if self.is_default.get() == 1:
-            self.db.add_city(
-                self.cities[self.index]
-            )  # saving the city as well incase it's not already saved
             self.db.set_default(cords)
-
         # removing current city as default if button unchecked
         elif self.is_default.get() == 0:
             self.db.remove_default(cords)

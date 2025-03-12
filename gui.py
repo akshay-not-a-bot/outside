@@ -18,18 +18,26 @@ class WeatherApp(ttk.Frame):
         self.configure_gui()
 
         self.user_input = None
+        self.is_default = tb.IntVar(master=self, value=0)
+
         # check for default city in DB if doesn't exist, pop up cities_popup
         if self.db.get_default():
+            default_city = self.db.get_default()
+            self.is_default = tb.IntVar(value=default_city[0])
+            self.city_name = default_city[1]
+            self.state_name = default_city[2]
+            self.country_name = default_city[3]
+            self.cords = (default_city[4], default_city[5])
+
             self.create_widgets()
         else:
             # if default city is set, create main screen directly
+            self.default_city = 0
             self.mand_city_search()
 
     def configure_gui(self):
         self.master.iconbitmap("assets/favicon.ico")
         self.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
-
-        # private function, only to be used in index_entry.bind
 
     def _get_index(self, event=None):
         # storing user choice
@@ -131,6 +139,7 @@ class WeatherApp(ttk.Frame):
         self.state_name = self.cities[self.index][2]
         self.country_name = self.cities[self.index][3]
         self.cords = (self.cities[self.index][4], self.cities[self.index][5])
+        self.is_default = tb.IntVar(value=0)
 
         self.create_widgets()
 
@@ -173,8 +182,9 @@ class WeatherApp(ttk.Frame):
             self.city_name = values[0]
             self.state_name = values[1]
             self.country_name = values[2]
-            self.default_city = values[3]
+            self.is_default = tb.IntVar(value=values[3])
             self.cords = (values[4], values[5])
+
         self.saved_frame.destroy()
         self.create_widgets()
 
@@ -199,6 +209,12 @@ class WeatherApp(ttk.Frame):
         self.saved_table.pack(padx=40, pady=20)
         self.saved_table.view.bind("<ButtonRelease-1>", self.select_city)
 
+    def default_op(self, cords):
+        if self.is_default.get() == 1:
+            self.db.set_default(cords)
+        elif self.is_default.get() == 0:
+            self.db.remove_default(cords)
+
     def create_widgets(self):
         # ------ Main Container Frame ------
         # First checking to see if main frame already exists:
@@ -212,7 +228,6 @@ class WeatherApp(ttk.Frame):
             self.main_frame = ttk.Frame(self, padding=10)
             self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # ------ Data collection ------
         # getting weather data
         self.weather_data = weather.get_weather(self.cords)
 
@@ -237,7 +252,6 @@ class WeatherApp(ttk.Frame):
         ).pack()
 
         # *** Sub Search: search city ***
-
         search_box_frame = ttk.Frame(search_frame)
         search_box_frame.pack(side="top", anchor="center", pady=10, expand=True)
 
@@ -264,14 +278,17 @@ class WeatherApp(ttk.Frame):
         ).pack(side="left", padx=10)
 
         # Spacer
-        ttk.Frame(search_box_frame, width=150).pack(side="left")
+        ttk.Frame(search_box_frame, width=100).pack(side="left")
 
         # Set current city as default button
-        # tb.Checkbutton(
-        #     bootstyle="success-round-toggle",
-        #     text="Set as Default City",
-        #     command=lambda: self.db.set_default(),
-        # )
+        self.check_button = tb.Checkbutton(
+            search_box_frame,
+            text="Set as Default",
+            variable=self.is_default,
+            bootstyle="success-round-toggle",
+            command=lambda: self.default_op(self.cords),
+        )
+        self.check_button.pack(side="left", padx=10)
 
         # Sub Search: Saved locations
         button1 = ttk.Button(

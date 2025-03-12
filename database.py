@@ -41,23 +41,33 @@ class DataBase:
 
     def add_city(self, city):
         query = "INSERT OR IGNORE INTO saved_cities (name, state, country, lat,  long) VALUES (?,?,?,?,?)"
-        params = (city[1], city[2], city[3], f"{city[4]:.4f}", f"{city[5]:.4f}")
+        params = (city[1], city[2], city[3], round(city[4], 4), round(city[5], 4))
         self._execute_query(query, params)
 
-    def delete_city(self):
-        pass
+    def remove_default(self, cords):
+        lat, long = cords
+        query = "UPDATE saved_cities SET is_default = ? WHERE lat = ? AND long = ?"
+        params = (0, lat, long)
+        self._execute_query(query, params)
 
     def get_cities(self):
         query = "SELECT name, state, country, is_default, lat, long FROM saved_cities"
         return self._execute_query(query, fetchall=True)
 
-    def set_default(self):
-        # after setting a city as default, make sure there is only one default city. If not, resolve so there is only one
-        pass
+    def set_default(self, cords):
+        lat, long = cords
+
+        # clearing all other records default to zero so there can't be two default city
+        query1 = "UPDATE saved_cities SET is_default = ? WHERE is_default = ?"
+        params1 = (0, 1)
+        self._execute_query(query1, params1)
+
+        # now setting passed city as default:
+        query2 = "UPDATE saved_cities SET is_default = ? WHERE lat = ? AND long =?"
+        params2 = (1, lat, long)
+        self._execute_query(query2, params2)
 
     def get_default(self):
-        query = (
-            "SELECT is_default, name, lat, long FROM saved_cities WHERE is_default = ?"
-        )
+        query = "SELECT is_default, name, state, country, lat, long FROM saved_cities WHERE is_default = ?"
         params = (1,)
         return self._execute_query(query, params, fetchone=True)

@@ -26,8 +26,8 @@ def get_city(city: str):
                 state = r.get("admin1", "N/A")
                 # using get method so default value can be assigned incase there is no key names "admin1", prevents KeyError
                 country = r.get("country", "N/A")
-                lat = r["latitude"]
-                long = r["longitude"]
+                lat = round(r["latitude"], 4)
+                long = round(r["longitude"], 4)
                 cities.append(
                     (indx, name, state, country, lat, long)
                 )  # keep a note of the sequence for indexing the touple later
@@ -78,15 +78,3 @@ def get_weather(cords):
 
     except Exception as E:
         print(f"Error while fetching weather data: {E}")
-
-
-def main():
-    user_input = input("Enter city name: ").strip()
-    cities_list = get_city(user_input)
-    pick = input("Enter the index of your city ")
-    cords = get_cordinates(cities_list, pick)
-    weather_data = get_weather(cords)
-
-
-if __name__ == "__main__":
-    main()

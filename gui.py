@@ -212,10 +212,10 @@ class WeatherApp(ttk.Frame):
     def default_op(self, cords):
         # setting current city as default if button checked
         if self.is_default.get() == 1:
-            self.db.set_default(cords)
             self.db.add_city(
                 self.cities[self.index]
             )  # saving the city as well incase it's not already saved
+            self.db.set_default(cords)
 
         # removing current city as default if button unchecked
         elif self.is_default.get() == 0:

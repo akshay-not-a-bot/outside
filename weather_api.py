@@ -97,7 +97,6 @@ def main():
     pick = input("Enter the index of your city ")
     cords = get_cordinates(cities_list, pick)
     weather_data = get_weather(cords)
-    print(f"Temp: {weather_data.Variables(0).Value():2f}")
 
 
 if __name__ == "__main__":

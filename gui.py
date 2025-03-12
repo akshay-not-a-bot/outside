@@ -14,15 +14,16 @@ class WeatherApp(ttk.Frame):
 
         # initiating DB
         self.db = DataBase()
-        # check for default city in DB if doesn't exist, pop up cities_popup
-        self.user_input = None
-
-        if not self.db.get_default():
-            self.mand_city_search()
 
         self.configure_gui()
 
-        self.create_widgets()
+        self.user_input = None
+        # check for default city in DB if doesn't exist, pop up cities_popup
+        if self.db.get_default():
+            self.create_widgets()
+        else:
+            # if default city is set, create main screen directly
+            self.mand_city_search()
 
     def configure_gui(self):
         self.master.iconbitmap("assets/favicon.ico")
@@ -32,7 +33,7 @@ class WeatherApp(ttk.Frame):
 
     def _get_index(self, event=None):
         # storing user choice
-        self.index = int(self.index_entry.get())
+        self.index = int(self.index_entry.get()) - 1
         self.popup.destroy()
 
     def _get_input(self, event=None):
@@ -40,11 +41,13 @@ class WeatherApp(ttk.Frame):
         if self.entry1.get():
             self.user_input = self.entry1.get()
             self.entry1.delete(0, tk.END)
+        return self.user_input
 
     def _get_tl_input(self, event=None):
         if self.tl_entry1.get():
             self.user_input = self.tl_entry1.get()
             self.tl_entry1.delete(0, tk.END)
+            self.cities_popup()
         return self.user_input
 
     def _get_mand_input(self, event=None):
@@ -57,14 +60,25 @@ class WeatherApp(ttk.Frame):
 
     # function to search & select city by user in a Toplevel window
     def cities_popup(self, event=None):
-        self.popup = tb.Toplevel(
-            title="Choose your City",
-            size=(1200, 800),
-            position=(150, 88),
-        )
+        # checking to see if popup windows already exists:
+        if hasattr(self, "popup") and self.popup.winfo_exists():
+            # clear existing content and create those widgets later down the line
+            # rather than opening a new popup window
+            for widget in self.popup.winfo_children():
+                widget.destroy()
+
+        # create a new popup window only if it doesn't exist
+        else:
+            self.popup = tb.Toplevel(
+                title="Choose your City",
+                size=(1200, 800),
+                position=(150, 88),
+            )
 
         # City search bar, if user needs to search for a city again
-        tl_search_frame = tb.Labelframe(self.popup, takefocus=True, style="success")
+        tl_search_frame = tb.Labelframe(
+            self.popup, text="City Search", takefocus=True, style="success"
+        )
         tl_search_frame.pack(padx=20, pady=20)
 
         self.tl_entry1 = ttk.Entry(
@@ -110,11 +124,15 @@ class WeatherApp(ttk.Frame):
         )
         self.index_entry.pack()
         self.index_entry.bind("<Return>", self._get_index)
-        self.popup.wait_window()
-        # getting cordinates
-        cords = weather.get_cordinates(self.cities, self.index)
-        # getting weather data
-        self.weather_data = weather.get_weather(cords)
+        self.wait_window(self.popup)
+
+        # Storing values
+        self.city_name = self.cities[self.index][1]
+        self.state_name = self.cities[self.index][2]
+        self.country_name = self.cities[self.index][3]
+        self.cords = (self.cities[self.index][4], self.cities[self.index][5])
+
+        self.create_widgets()
 
     # mandatory city search if there is no default city set
     def mand_city_search(self):
@@ -145,53 +163,124 @@ class WeatherApp(ttk.Frame):
 
         self.master.wait_window(self.temp_frame)
 
+    def select_city(self, table):
+        selected_city = self.saved_table.view.selection()
+        if selected_city:
+            # extracting values from first selected row
+            values = self.saved_table.view.item(selected_city[0], "values")
+
+            # updating values
+            self.city_name = values[0]
+            self.state_name = values[1]
+            self.country_name = values[2]
+            self.default_city = values[3]
+            self.cords = (values[4], values[5])
+        self.saved_frame.destroy()
+        self.create_widgets()
+
+    def saved_locations(self, event=None):
+        self.saved_frame = tb.Toplevel(
+            title="Saved Locations",
+            size=(850, 550),
+            position=(300, 225),
+            transient=self.master,
+        )
+        self.saved_frame.config(bg="#34495e")
+
+        header = ["City Name", "State", "Country", "Default", "Latitude", "Longitude"]
+        saved = self.db.get_cities()
+        self.saved_table = Tableview(
+            self.saved_frame,
+            coldata=header,
+            rowdata=saved,
+            bootstyle="success",
+            autoalign=True,
+        )
+        self.saved_table.pack(padx=40, pady=20)
+        self.saved_table.view.bind("<ButtonRelease-1>", self.select_city)
+
     def create_widgets(self):
         # ------ Main Container Frame ------
-        self.main_frame = ttk.Frame(self, padding=10)
-        self.main_frame.pack(fill=tk.BOTH, expand=True)
+        # First checking to see if main frame already exists:
+        if hasattr(self, "main_frame") and self.main_frame.winfo_exists():
+            # Reloading main frame so content gets updated
+            for widget in self.main_frame.winfo_children():
+                widget.destroy()
+
+        # no pre-existing main frame, meaning it is getting called the first time
+        else:
+            self.main_frame = ttk.Frame(self, padding=10)
+            self.main_frame.pack(fill=tk.BOTH, expand=True)
+
+        # ------ Data collection ------
+        # getting weather data
+        self.weather_data = weather.get_weather(self.cords)
 
         # ****** Search Frame ******
         search_frame = ttk.Frame(self.main_frame)
-        search_frame.pack(fill=tk.X, pady=5)
+        search_frame.pack(pady=5, fill="x")
 
         # *** Sub search: App name ***
         name_frame = ttk.Frame(search_frame)
-        name_frame.pack(side="left", anchor="nw")
+        name_frame.pack(side="left", padx=20)
         ttk.Label(
             name_frame,
             text="OUTSIDE?",
             font=("Poppins", 20, "bold"),
             justify="center",
-        ).grid(row=0, column=0, sticky="NSEW")
+        ).pack()
         ttk.Label(
             name_frame,
             text="a weather app",
             font=("Poppins", 10, "italic"),
             justify="center",
-        ).grid(row=1, column=0, sticky="NSEW", padx=(25, 0))
+        ).pack()
 
         # *** Sub Search: search city ***
-        self.entry1 = ttk.Entry(search_frame, font=("Arial", 14))
-        self.entry1.pack(anchor="center", padx=10, ipadx=40, pady=10)
-        self.entry1.pack_propagate(False)
-        self.entry1.configure(width=50)
+
+        search_box_frame = ttk.Frame(search_frame)
+        search_box_frame.pack(side="top", anchor="center", pady=10, expand=True)
+
+        self.entry1 = ttk.Entry(search_box_frame, font=("Poppins", 14), width=40)
+        self.entry1.pack(side="left", padx=10, ipady=5)
 
         # Sub Search: getting info for city search
         self.entry1.bind(
-            "<Return>", lambda event: (self.cities_popup(), self._get_input())
+            "<Return>", lambda event: (self._get_input(), self.cities_popup())
         )
         ttk.Button(
-            self.entry1,
+            search_box_frame,
             text="Search",
             bootstyle="success-outline",
-            command=lambda: (self.cities_popup(), self._get_input()),
-        ).pack(side="right")
+            command=lambda event=None: (self._get_input(), self.cities_popup()),
+        ).pack(side="left", padx=10)
 
-        # Sub Search: Saved location
+        # Save button to save current city
+        ttk.Button(
+            search_box_frame,
+            text="Save 📑",
+            bootstyle="success-outline",
+            command=lambda event=None: self.db.add_city(self.cities[self.index]),
+        ).pack(side="left", padx=10)
+
+        # Spacer
+        ttk.Frame(search_box_frame, width=150).pack(side="left")
+
+        # Set current city as default button
+        # tb.Checkbutton(
+        #     bootstyle="success-round-toggle",
+        #     text="Set as Default City",
+        #     command=lambda: self.db.set_default(),
+        # )
+
+        # Sub Search: Saved locations
         button1 = ttk.Button(
-            search_frame, text="Saved Locations", bootstyle="success-outline"
+            search_box_frame,
+            text="Saved Locations",
+            bootstyle="success-outline",
+            command=self.saved_locations,
         )
-        button1.pack(side="right", padx=30, pady=10)
+        button1.pack(side="left", padx=10, pady=10)
 
         # ------ City & Weather Info Frame ------
         info_frame = ttk.Frame(self.main_frame)
@@ -204,17 +293,17 @@ class WeatherApp(ttk.Frame):
         city_frame.pack_propagate(False)
         ttk.Label(
             city_frame,
-            text=self.cities[self.index - 1][1],
+            text=self.city_name,
             font=("Poppins", 28, "bold"),
         ).pack(pady=(65, 0))
         ttk.Label(
             city_frame,
-            text=self.cities[self.index - 1][2],
+            text=self.state_name,
             font=("Poppins", 18, "bold"),
         ).pack(pady=10)
         ttk.Label(
             city_frame,
-            text=self.cities[self.index - 1][3],
+            text=self.country_name,
             font=("Poppins", 18, "bold"),
         ).pack()
 

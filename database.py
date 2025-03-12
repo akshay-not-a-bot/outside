@@ -31,39 +31,25 @@ class DataBase:
             name TEXT NOT NULL,
             state TEXT NOT NULL,
             country TEXT NOT NULL,
-            lat REAL NOT NULL,
-            long REAL NOT NULL,
+            lat REAL UNIQUE NOT NULL,
+            long REAL UNIQUE NOT NULL,
             is_default INTEGER DEFAULT 0
         )
         """
         # sending this DB table create query to _execute_query so it gets executed
         self._execute_query(query)
 
-    def add_city(self):
-        # IMP logical thinking
-        # need city data tuple of the user selected city from the gui.py. Go to gui.py's popup func
-        # where it gets user choice index and select the city tuple using that and call this function by passing that tuple
-
-        # DB has two tables? 1 for cities and 1 for current city's weather data
-
-        # when application starts search databse's column "default" for 1 if no record has 1 then popup window asking user to search for city
-        # alternatively, you can also cache the last searched city and show the data for that next time app opens.
-
-        # In the Saved Locations page, give set default column (there can only be one), and select button for each city
-        # which will take you to main page and app will show weather for that city.
-        pass
+    def add_city(self, city):
+        query = "INSERT OR IGNORE INTO saved_cities (name, state, country, lat,  long) VALUES (?,?,?,?,?)"
+        params = (city[1], city[2], city[3], f"{city[4]:.4f}", f"{city[5]:.4f}")
+        self._execute_query(query, params)
 
     def delete_city(self):
         pass
 
-    def add_weather_data(self):
-        pass
-
-    def get_weather_data(self):
-        pass
-
     def get_cities(self):
-        pass
+        query = "SELECT name, state, country, is_default, lat, long FROM saved_cities"
+        return self._execute_query(query, fetchall=True)
 
     def set_default(self):
         # after setting a city as default, make sure there is only one default city. If not, resolve so there is only one
@@ -73,4 +59,5 @@ class DataBase:
         query = (
             "SELECT is_default, name, lat, long FROM saved_cities WHERE is_default = ?"
         )
-        return self._execute_query(query, (1,), fetchone=True)
+        params = (1,)
+        return self._execute_query(query, params, fetchone=True)

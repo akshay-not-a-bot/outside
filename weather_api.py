@@ -46,17 +46,6 @@ def get_city(city: str):
         print(f"Enter only the index of the city: {TE}")
 
 
-# this function gets cities list from get_city() and get's user picked index of the city from main
-def get_cordinates(cities, pick):
-    # $PRODUCTION$ printing list in terminal for testing purposes
-    # print("Index    Name    State   Country   Lat     Long")
-    # for city in cities:
-    #     print(f"{city[0]}.  {city[1]}    {city[2]}   {city[3]}    {city[4]}   {city[5]}")
-    lat = cities[pick - 1][4]
-    long = cities[pick - 1][5]
-    return lat, long
-
-
 # this funcation takes touple of cordinates: (latitude, longitude) as argument
 def get_weather(cords):
     # Setup the Open-Meteo API client with cache and retry on error

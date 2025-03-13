@@ -1,10 +1,21 @@
-# Next: # 
+# 🌦️ WeatherApp #
 
-# Changelog/ Features: #
-1. App will directly ask to search for a city if there is no default city set
-2. in City search window, a search bar to search for a different city
-3. Saved Locations feature and Save city button in main screen
-4. Clickable Table rows 
-5. Set as default button
+#### 🚀 Introducing WeatherApp! A sleek, GUI-based weather application that provides real-time weather updates, forecasts, and saved city management—all in an intuitive and user-friendly interface. ####
 
+
+
+## 🔹 Key Features ##
+✅ Current Weather Updates – Fetch real-time weather data from Open-Meteo.\
+✅ 7-Day Forecast – View upcoming weather conditions at a glance.\
+✅ Saved Cities – Store and manage favorite locations for quick access.\
+✅ Unit Preferences – Choose between Celsius and Fahrenheit.\
+✅ Modern UI – Built with Tkinter and ttkbootstrap for a polished look.\
+
+
+
+## 🛠️ Tech Stack ##
+Python – Core programming language\
+Tkinter (ttk, ttkbootstrap) – GUI framework\
+Open-Meteo API – Fetches weather data\
+SQLite Database – Stores user preferences & saved cities\
 

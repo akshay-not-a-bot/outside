@@ -20,6 +20,16 @@ storing weather data
     ~~OR there is a welcome screen on greetings and will prompt to select the city first and maybe store that in a file and
     only open this welcome screen if the file is empty~~ --> Checking is_default field in DB for this and prompting to search for a city if not found.
 
+Need to change the logic of how I'm creating widgets in main frame using create_widgets:
+    ~~Reason: when user selects a city from saved location there is user_index or cities list so we dont get the city info and weather info as well since we call that from cities_popup and not from create_widget
+
+    So we need to have create_widgets call all the api fetching for city info and weather info.
+
+    In the city select from list, rather than getting user_index and passing it to create_widgets, get the necessary info create_widgets migth need for data fetching like name, and cords and stuff and store it in self. variables so it can be directly accessed. 
+
+    Create_widgets will directly use this~~ DONE
+
+
     
 
 

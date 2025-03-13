@@ -14,9 +14,6 @@ def get_city(city: str):
         response_raw = requests.get(url, params=params)
         response_raw.raise_for_status()
         response = response_raw.json()
-        # $PRODUCTION$ storing data in a file to compare
-        with open("response.json", "w") as data:
-            json.dump(response, data, indent=4)
 
         if "results" in response and len(response["results"]) > 0:
             indx = 1

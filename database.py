@@ -3,8 +3,8 @@ import sqlite3
 
 class DataBase:
 
-    def __init__(self):
-        self.db_name = "weather_app.db"
+    def __init__(self, db_name):
+        self.db_name = db_name
         self._init_database()
 
     # manages all queries

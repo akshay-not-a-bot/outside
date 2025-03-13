@@ -8,12 +8,12 @@ from PIL import Image, ImageTk  # for icons
 
 
 class WeatherApp(ttk.Frame):
-    def __init__(self, master=None):
+    def __init__(self, master=None, db_name="weather_app.db"):
         super().__init__(master)
         self.master = master
 
         # initiating DB
-        self.db = DataBase()
+        self.db = DataBase(db_name)
 
         self.configure_gui()
 

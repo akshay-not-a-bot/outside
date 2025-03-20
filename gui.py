@@ -7,13 +7,13 @@ from database import DataBase
 from PIL import Image, ImageTk  # for icons
 
 
-class WeatherApp(ttk.Frame):
-    def __init__(self, master=None):
+class WeatherApp(tb.Frame):
+    def __init__(self, master=None, db_name="weather_app.db"):
         super().__init__(master)
         self.master = master
 
         # initiating DB
-        self.db = DataBase()
+        self.db = DataBase(db_name)
 
         self.configure_gui()
 
@@ -71,6 +71,11 @@ class WeatherApp(ttk.Frame):
         self.temp_frame.destroy()
         return self.user_input
 
+    # change cursor appreance when hovering over table
+    def _change_cursor(self, event):
+        # selecting by widget(table) method so thid function can be used for all tables
+        event.widget.configure(cursor="hand2")
+
     # function to search & select city by user in a Toplevel window
     def cities_popup(self, event=None):
         # checking to see if popup windows already exists:
@@ -125,20 +130,9 @@ class WeatherApp(ttk.Frame):
             autoalign=True,
         )
         self.city_table.pack(padx=20, pady=20)
+        self.city_table.bind("<Enter>", self._change_cursor)
         self.city_table.view.bind("<ButtonRelease-1>", self._get_index)
 
-        # Enter widget to get the user choice index
-        # index_frame = tb.Labelframe(
-        #     self.popup,
-        #     text="Enter the index of the city",
-        #     style="success",
-        # )
-        # index_frame.pack(padx=20, ipadx=20)
-        # self.index_entry = ttk.Entry(
-        #     index_frame, justify="center", font=("Poppins", 16)
-        # )
-        # self.index_entry.pack()
-        # self.index_entry.bind("<Return>", self._get_index)
         self.wait_window(self.popup)
 
         # Storing values
@@ -214,6 +208,7 @@ class WeatherApp(ttk.Frame):
             autoalign=True,
         )
         self.saved_table.pack(padx=40, pady=20)
+        self.saved_table.bind("<Enter>", self._change_cursor)
         self.saved_table.view.bind("<ButtonRelease-1>", self.select_city)
 
     def default_op(self, cords):
@@ -234,26 +229,26 @@ class WeatherApp(ttk.Frame):
 
         # no pre-existing main frame, meaning it is getting called the first time
         else:
-            self.main_frame = ttk.Frame(self, padding=10)
-            self.main_frame.pack(fill=tk.BOTH, expand=True)
+            self.main_frame = tb.Frame(self, padding=10)
+            self.main_frame.pack(fill="both", expand=True)
 
         # getting weather data
         self.weather_data = weather.get_weather(self.cords)
 
         # ****** Search Frame ******
-        search_frame = ttk.Frame(self.main_frame)
+        search_frame = tb.Frame(self.main_frame)
         search_frame.pack(pady=5, fill="x")
 
         # *** Sub search: App name ***
-        name_frame = ttk.Frame(search_frame)
+        name_frame = tb.Frame(search_frame)
         name_frame.pack(side="left", padx=20)
-        ttk.Label(
+        tb.Label(
             name_frame,
             text="OUTSIDE?",
             font=("Poppins", 20, "bold"),
             justify="center",
         ).pack()
-        ttk.Label(
+        tb.Label(
             name_frame,
             text="a weather app",
             font=("Poppins", 10, "italic"),
@@ -261,7 +256,7 @@ class WeatherApp(ttk.Frame):
         ).pack()
 
         # *** Sub Search: search city ***
-        search_box_frame = ttk.Frame(search_frame)
+        search_box_frame = tb.Frame(search_frame)
         search_box_frame.pack(side="top", anchor="center", pady=10, expand=True)
 
         self.entry1 = ttk.Entry(search_box_frame, font=("Poppins", 14), width=40)
@@ -287,7 +282,7 @@ class WeatherApp(ttk.Frame):
         ).pack(side="left", padx=10)
 
         # Spacer
-        ttk.Frame(search_box_frame, width=100).pack(side="left")
+        tb.Frame(search_box_frame, width=100).pack(side="left")
 
         # Set current city as default button
         self.check_button = tb.Checkbutton(
@@ -309,35 +304,49 @@ class WeatherApp(ttk.Frame):
         button1.pack(side="left", padx=10, pady=10)
 
         # ------ City & Weather Info Frame ------
-        info_frame = ttk.Frame(self.main_frame)
+        info_frame = tb.Frame(self.main_frame)
         info_frame.pack(fill=tk.X, padx=10, pady=5)
 
         # ****** City info frame ******
-        city_frame = tk.LabelFrame(info_frame, text="City Info", width=480, height=330)
-        city_frame.grid(row=0, column=0, sticky="NSEW", padx=10, pady=10)
+        city_frame = tb.Labelframe(
+            info_frame,
+            text="City Info",
+            width=480,
+            height=330,
+            style="success",
+            border=5,
+            borderwidth=5,
+            relief="raised",
+        )
+        city_frame.grid(row=0, column=0, sticky="NSEW", padx=10, pady=5)
         city_frame.grid_propagate(False)
         city_frame.pack_propagate(False)
-        ttk.Label(
+        tb.Label(
             city_frame,
             text=self.city_name,
             font=("Poppins", 28, "bold"),
         ).pack(pady=(65, 0))
-        ttk.Label(
+        tb.Label(
             city_frame,
             text=self.state_name,
             font=("Poppins", 18, "bold"),
         ).pack(pady=10)
-        ttk.Label(
+        tb.Label(
             city_frame,
             text=self.country_name,
             font=("Poppins", 18, "bold"),
         ).pack()
 
         # ****** current weather info frame ******
-        weather_frame = tk.LabelFrame(
-            info_frame, text="Weather Info", width=870, height=330
+        weather_frame = tb.Labelframe(
+            info_frame,
+            text="Weather Info",
+            width=870,
+            height=330,
+            style="success",
+            relief="raised",
         )
-        weather_frame.grid(row=0, column=1, sticky="NSEW", padx=10, pady=10)
+        weather_frame.grid(row=0, column=1, sticky="NSEW", padx=10, pady=5)
         weather_frame.grid_propagate(False)
         weather_frame.pack_propagate(False)
 
@@ -351,13 +360,13 @@ class WeatherApp(ttk.Frame):
         cur_wind = current.Variables(4).Value()
 
         # temp
-        ttk.Label(
+        tb.Label(
             weather_frame,
             text=f"{cur_temp:.1f}°C",
             font=("Poppins", 40, "italic"),
         ).grid(row=0, column=0, sticky="w", padx=30, pady=(50, 0))
         # actual temp
-        ttk.Label(
+        tb.Label(
             weather_frame,
             text=f"Feels like {cur_act_temp:.1f}°C",
             font=("Poppins", 14, "italic"),
@@ -374,18 +383,18 @@ class WeatherApp(ttk.Frame):
             self.icon = ImageTk.PhotoImage(img)
         except Exception as e:
             print("Error loading image: ", e)
-        icon_label = ttk.Label(weather_frame, image=self.icon)
+        icon_label = tb.Label(weather_frame, image=self.icon)
         icon_label.grid(row=0, column=1, padx=20, pady=20)
 
         # Day / Night label
-        ttk.Label(
+        tb.Label(
             weather_frame,
             text=dn_text,
             font=("Poppins semibold", 20),
         ).grid(row=1, column=1, padx=20)
 
         # Other info
-        other_frame = ttk.Frame(weather_frame)
+        other_frame = tb.Frame(weather_frame)
         other_frame.grid(row=0, column=2, rowspan=2, padx=(40, 0), pady=50)
 
         info_labels = [
@@ -394,19 +403,26 @@ class WeatherApp(ttk.Frame):
         ]
 
         for i, (text, value) in enumerate(info_labels):
-            ttk.Label(other_frame, text=text, font=("Poppins", 14, "bold")).grid(
+            tb.Label(other_frame, text=text, font=("Poppins", 14, "bold")).grid(
                 row=i, column=0, sticky="w"
             )
-            ttk.Label(other_frame, text=value, font=("Poppins", 12)).grid(
+            tb.Label(other_frame, text=value, font=("Poppins", 12)).grid(
                 row=i, column=1, sticky="w"
             )
 
         # ------ Forecast Frames ------
-        forecast_frame = ttk.Frame(self.main_frame)
+        forecast_frame = tb.Frame(self.main_frame)
         forecast_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
         # ****** Daily forecast frame ******
-        day_frame = tk.LabelFrame(forecast_frame, text="", width=510, height=370)
+        day_frame = tb.Labelframe(
+            forecast_frame,
+            text="",
+            width=510,
+            height=370,
+            style="success",
+            relief="raised",
+        )
         day_frame.grid(row=0, column=0, sticky="NSEW", padx=10, pady=10)
         day_frame.grid_propagate(False)
         day_frame.pack_propagate(False)
@@ -418,28 +434,35 @@ class WeatherApp(ttk.Frame):
             (daily.Variables(0).Values(i), daily.Variables(1).Values(i))
             for i in range(7)
         ]
-        ttk.Label(
+        tb.Label(
             day_frame,
-            text="7 Days Forecast from today:",
+            text="7 Days Daily Forecast :",
             font=("Poppins", 18, "bold"),
         ).pack(anchor="w", pady=(5, 10), padx=5)
 
         for i, (daily_temp, daily_wind) in enumerate(daily_data):
-            ttk.Label(
+            tb.Label(
                 day_frame,
-                text=f" ⁘ Day{i+1}    🌤 Temp: {daily_temp:.1f}℃    💨 Wind: {daily_wind:.1f}km/h",
+                text=f" ⁘ Day {i+1}    🌤 Temp: {daily_temp:.1f}℃    💨 Wind: {daily_wind:.1f}km/h",
                 font=("Poppins semibold", 12),
             ).pack(anchor="center", pady=5)
 
         # ****** Hourly data frame ******
         hourly = self.weather_data.Hourly()
-        hourly_frame = tk.LabelFrame(forecast_frame, text="", width=870, height=370)
-        hourly_frame.grid(row=0, column=1, padx=5, pady=5)
+        hourly_frame = tb.Labelframe(
+            forecast_frame,
+            text="",
+            width=840,
+            height=370,
+            style="success",
+            relief="raised",
+        )
+        hourly_frame.grid(row=0, column=1, padx=10, pady=5)
         hourly_frame.grid_propagate(False)
         hourly_frame.pack_propagate(False)
-        ttk.Label(
+        tb.Label(
             hourly_frame,
-            text="Hourly Forecast (for each hour):",
+            text="6  Hours Hourly Forecast :",
             font=("Poppins", 18, "bold"),
         ).pack(fill="x", padx=(10,), pady=(10, 20))
 
@@ -455,9 +478,9 @@ class WeatherApp(ttk.Frame):
             act_temp = hourly_data[1][i]
             wind = hourly_data[2][i]
 
-            formatted_hourly = f"🌤  Temp: {temp:.1f}°C \t   🌡  Feels: {act_temp:.1f}°C \t   💨  Wind: {wind:.1f}km/h"
+            formatted_hourly = f"Hour {i+1}:    🌤  Temp: {temp:.1f}°C \t   🌡  Feels: {act_temp:.1f}°C \t   💨  Wind: {wind:.1f}km/h"
 
-            ttk.Label(
+            tb.Label(
                 hourly_frame, text=f"{formatted_hourly}", font=("Poppins semibold", 12)
             ).pack(anchor="center", pady=5)
 

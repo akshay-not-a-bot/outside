@@ -4,7 +4,7 @@ import tkinter as tk
 
 
 def welcome_msg():
-    """Printins a Welcome message in the terminal before launching the Outside? App"""
+    """Printing a Welcome message in the terminal before launching the Outside? App"""
     print("Hello and Welcome to the Outside? a weather app")
     print("Launching the application. . . . .")
 
@@ -17,8 +17,10 @@ def get_window_size():
     temp.destroy()
 
     # Adjust size of the window incase the screen size if smaller than the window size
-    width = min(1500, int(scr_width * 0.8))
-    height = min(976, int(scr_height * 0.75))
+    # width = min(1500, int(scr_width * 0.95))
+    # height = min(976, int(scr_height * 0.9))
+    width = 1500
+    height = 976
 
     return width, height
 

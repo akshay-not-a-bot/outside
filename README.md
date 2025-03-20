@@ -1,9 +1,5 @@
 # WeatherApp
 
-## Video Demonstration
-
-[Video URL]
-
 ## Description
 
 WeatherApp is a Python-based graphical application that provides real-time weather updates and forecasts. It features a user-friendly interface built with Tkinter and ttkbootstrap, integrating Open-Meteo API to fetch weather data and an SQLite database to manage saved locations. The app allows users to check current weather conditions, save favorite cities, set a default city, and view forecasts. 

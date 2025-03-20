@@ -11,8 +11,8 @@ def get_window_size():
     temp.destroy()
 
     # Adjust size of the window incase the screen size if smaller than the window size
-    width = min(1500, int(scr_width * 0.95))
-    height = min(976, int(scr_height * 0.9))
+    width = min(1500, int(scr_width))
+    height = min(976, int(scr_height))
 
     return width, height
 

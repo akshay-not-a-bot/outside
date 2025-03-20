@@ -1,8 +1,5 @@
 # WeatherApp
 
-## Video Demonstration
-
-[Video URL]
 
 ## Description
 
@@ -17,9 +14,9 @@ WeatherApp is a Python-based graphical application that provides real-time weath
 
 ## Project Structure
 
-### `project.py`
+### `main.py`
 
-This is the main entry point of the application. It must be executed to run the WeatherApp. The required `main()` function is defined at the top level along with 3 other functions to meet CS50’s project requirements. However, all of the functionality is handled in supporting modules not in this file.
+This is the main entry point of the application. It must be executed to run the WeatherApp. The required `main()` function is defined at the top level along with other functions. However, all of the functionality is handled in supporting modules not in this file.
 
 ### `weather_api.py`
 
@@ -45,13 +42,6 @@ Implements the Tkinter-based user interface with ttkbootstrap enhancements. Key 
 - Managing city preferences.
 - Interacting with the database and API.
 
-### `test_functions.py`
-
-Includes tests for verifying:
-
-- API responses and data retrieval.
-- Database functionality such as adding, retrieving, and deleting cities.
-- GUI interactions using mock data.
 
 ## Design Choices
 
@@ -74,12 +64,11 @@ Includes tests for verifying:
    ```
 3. Run the application:
    ```bash
-   python project.py
+   python main.py
    ```
 
 ## Acknowledgments
 
-- CS50 Python course for foundational knowledge.
 - Open-Meteo API for weather data.
 - ttkbootstrap for UI enhancements.
 
